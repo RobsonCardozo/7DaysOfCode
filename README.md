@@ -1,1 +1,1 @@
-7 Days of Code - Day 2
+7 Days of Code - Day 3 Exercise
