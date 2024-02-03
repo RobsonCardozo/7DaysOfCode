@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Robson Cardozo">
+  <title>7 Days of Code - Day 2</title>
+  <style>
+    #chat {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid #ffffff;
+      text-align: center;
+      overflow-y: scroll;
+    }
+
+    #form {
+      text-align: center;
+    }
+
+    #formButton {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat" class="chat-container"></div>
+
+<form id="form">
+  <label for="nome">Qual é o seu nome?</label>
+  <input type="text" id="nome" name="nome">
+  <button type="button" onclick="iniciarJogo()">Iniciar Jogo</button>
+</form>
+
+<script>
+  const respostas = {};
+  const chatDiv = document.getElementById('chat');
+  const formulario = document.getElementById('form');
+  let mensagemFinalExibida = false;
+
+  function imprimirMensagem(mensagem) {
+    const mensagemDiv = document.createElement('div');
+    mensagemDiv.textContent = mensagem;
+    chatDiv.appendChild(mensagemDiv);
+
+    if (!mensagemFinalExibida) {
+      chatDiv.appendChild(document.createElement('br'));
+    }
+  }
+
+  async function aguardarResposta() {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'text';
+      formulario.innerHTML = '';
+      formulario.appendChild(input);
+
+      const enviar = document.createElement('button');
+      enviar.textContent = 'Enviar';
+
+      enviar.addEventListener('click', () => {
+        const resposta = input.value;
+        resolve(resposta);
+        input.value = '';
+      });
+
+      formulario.appendChild(enviar);
+    });
+  }
+
+  async function iniciarJogo() {
+    const nome = document.getElementById('nome').value;
+
+    if (nome) {
+      imprimirMensagem(`Olá, ${nome}, vamos começar o jogo!`);
+      await fazerEscolha(nome);
+    } else {
+      imprimirMensagem('Por favor, insira seu nome para começar o jogo.');
+    }
+  }
+
+  async function fazerEscolha(nome) {
+    imprimirMensagem(`${nome}, você quer seguir para a área de Front-End ou Back-End?`);
+    const area = await aguardarResposta();
+
+    if (area.toLowerCase() === 'front-end' || area.toLowerCase() === 'frontend') {
+      await escolherFrontEnd(nome);
+    } else if (area.toLowerCase() === 'back-end' || area.toLowerCase() === 'backend') {
+      await escolherBackEnd(nome);
+    } else {
+      imprimirMensagem('Escolha inválida. Tente novamente.');
+      await fazerEscolha(nome);
+    }
+
+    await continuarAprendizado(nome);
+  }
+
+  async function escolherFrontEnd(nome) {
+    imprimirMensagem(`Você quer ser Front-End! Prefere aprender React ou Vue?`);
+    respostas.area = 'Front-End';
+    respostas.framework = await aguardarResposta();
+
+    imprimirMensagem(`${nome}, você quer ser Especialista ou Fullstack?`);
+    const opcao = await aguardarResposta();
+
+    if (opcao.toLowerCase() === 'especialista') {
+      imprimirMensagem(`Ótimo! Você decidiu se especializar na área de ${respostas.area} com ${respostas.framework}.`);
+    } else if (opcao.toLowerCase() === 'fullstack') {
+      imprimirMensagem(`Incrível! Você decidiu se tornar Fullstack, na área de ${respostas.area} com ${respostas.framework}.`);
+    } else {
+      imprimirMensagem('Escolha inválida.');
+    }
+  }
+
+  async function escolherBackEnd(nome) {
+    imprimirMensagem(`Você quer ser Back-End, ${nome}! Prefere aprender C# ou Java?`);
+    respostas.area = 'Back-End';
+    respostas.linguagem = await aguardarResposta();
+
+    imprimirMensagem(`${nome}, você quer ser Especialista ou Fullstack?`);
+    const opcao = await aguardarResposta();
+
+    if (opcao.toLowerCase() === 'especialista') {
+      imprimirMensagem(`Ótimo! Você decidiu se especializar na área de ${respostas.area} com ${respostas.linguagem}.`);
+    } else if (opcao.toLowerCase() === 'fullstack') {
+      imprimirMensagem(`Incrível! Você quer se tornar Fullstack, começando pela área de ${respostas.area} com ${respostas.linguagem}.`);
+    } else {
+      imprimirMensagem('Escolha inválida.');
+    }
+  }
+
+  async function continuarAprendizado(nome) {
+    if (!mensagemFinalExibida) {
+      imprimirMensagem(`${nome}, tem mais alguma tecnologia que você gostaria de aprender? (sim/não)`);
+      const resposta = await aguardarResposta();
+
+      if (resposta.toLowerCase() === 'sim') {
+        await inserirTecnologia(nome);
+      } else if (resposta.toLowerCase() === 'não') {
+        mostrarMensagemFinal(nome);
+      } else {
+        imprimirMensagem('Escolha inválida. Tente novamente.');
+        await continuarAprendizado(nome);
+      }
+    }
+  }
+
+  function mostrarMensagemFinal(nome) {
+    imprimirMensagem(`Obrigado por jogar, ${nome}! Seu caminho está traçado, agora é só seguir em frente e desenvolver suas habilidades!`);
+    mensagemFinalExibida = true;
+
+    formulario.innerHTML = '';
+    formulario.disabled = true;
+  }
+
+  async function inserirTecnologia(nome) {
+    imprimirMensagem(`${nome}, insira o nome da tecnologia que você gostaria de aprender:`);
+    const tecnologia = await aguardarResposta();
+    imprimirMensagem(`Ótima escolha! Você quer aprender mais sobre ${tecnologia}.`);
+    respostas.tecnologia = tecnologia;
+
+    await continuarAprendizado(nome);
+  }
+
+</script>
+
+</body>
+</html>
